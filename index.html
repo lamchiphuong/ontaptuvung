@@ -3,24 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn Từ Vựng Tiếng Anh - Rơi Từ</title>
+    <title>ÔN TẬP TỪ VỰNG TIẾNG ANH</title>
+    
+    <!-- Open Graph / Preview khi chia sẻ link -->
+    <meta property="og:title" content="ÔN TẬP TỪ VỰNG TIẾNG ANH">
+    <meta property="og:description" content="Hãy ôn tập từ vựng tiếng Anh bằng cách không để chữ rơi mất.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/10431/10431322.png">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5780/5780484.png" type="image/png">
+    
     <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            text-align: center;
-            background: linear-gradient(to bottom, #a0e7ff, #ffffff);
+        * { box-sizing: border-box; }
+        html, body {
+            height: 100%;
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(to bottom, #a0e7ff, #ffffff);
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
         }
         h1 {
             color: #1e3d59;
-            margin-bottom: 10px;
+            margin: 10px 0;
+            font-size: 28px;
+        }
+        #score, #progress, #message {
+            margin: 5px 0;
+            font-size: 24px;
+        }
+        #progress {
+            font-weight: bold;
+            color: #4a90e2;
+        }
+        #message {
+            min-height: 35px;
+            font-weight: bold;
         }
         #game-area {
-            margin: 40px auto 20px;
+            margin: 10px auto;
             width: 700px;
-            height: 400px;
+            max-width: 95vw;
+            height: 350px;
             position: relative;
             border-radius: 20px;
             overflow: hidden;
@@ -37,19 +68,20 @@
             top: -80px;
             animation: fall linear forwards;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            white-space: nowrap;
         }
         @keyframes fall {
-            to { top: 420px; }
+            to { top: 370px; }
         }
         #timer {
             position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 32px;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
             font-weight: bold;
             color: #e74c3c;
             background: rgba(255, 255, 255, 0.9);
-            padding: 12px 24px;
+            padding: 8px 20px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             z-index: 10;
@@ -60,12 +92,23 @@
             100% { transform: scale(1); }
         }
         #input-area {
-            margin: 20px auto;
-            padding: 20px;
+            margin: 10px auto;
+            padding: 15px;
             background: rgba(255,255,255,0.9);
             border-radius: 15px;
             width: 700px;
+            max-width: 95vw;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #letters-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 100%;
         }
         .letter-box {
             width: 50px;
@@ -77,10 +120,11 @@
             margin: 6px;
             border: 3px solid #4a90e2;
             border-radius: 10px;
-            display: inline-block;
             background-color: #f0f8ff;
             color: #1e3d59;
             transition: all 0.2s;
+            text-transform: uppercase;
+            flex-shrink: 0;
         }
         .letter-box.filled {
             background-color: #4a90e2;
@@ -98,26 +142,20 @@
             background-color: #bdc3c7;
             border-color: #95a5a6;
             color: #7f8c8d;
-            font-size: 28px;
+        }
+        .letter-box.hint {
+            background-color: #f39c12;
+            border-color: #e67e22;
+            color: white;
         }
         #hidden-input {
             position: absolute;
             left: -9999px;
         }
-        #score {
-            font-size: 28px;
-            color: #1e3d59;
-            margin: 20px;
-        }
-        #message {
-            font-size: 26px;
-            font-weight: bold;
-            min-height: 40px;
-            margin: 10px;
-        }
-        #start-btn {
+        #start-btn, #hint-btn {
             font-size: 22px;
             padding: 12px 30px;
+            margin: 10px;
             background: #4a90e2;
             color: white;
             border: none;
@@ -126,9 +164,12 @@
             box-shadow: 0 5px 15px rgba(74,144,226,0.4);
             transition: 0.3s;
         }
-        #start-btn:hover {
+        #hint-btn {
+            background: #f39c12;
+            display: none;
+        }
+        #start-btn:hover, #hint-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(74,144,226,0.5);
         }
         #overlay {
             display: none;
@@ -149,8 +190,8 @@
             text-align: center;
             z-index: 101;
             display: none;
-            max-width: 500px;
-            width: 90%;
+            max-width: 90%;
+            width: 500px;
         }
         #result-popup h2 {
             font-size: 36px;
@@ -174,18 +215,23 @@
     </style>
 </head>
 <body>
-    <h1>Ôn Từ Vựng Tiếng Anh - Rơi Từ</h1>
+    <h1>Ôn Từ Vựng Tiếng Anh - ĐỪNG ĐỂ TỪ RƠI</h1>
     <button id="start-btn">Bắt Đầu</button>
     <div id="score">Điểm: 0</div>
+    <div id="progress">Từ đã làm: 0 / 0</div>
     <div id="message"></div>
     <div id="game-area"></div>
-    <div id="input-area"></div>
+    <div id="input-area">
+        <div id="letters-container"></div>
+    </div>
+    <button id="hint-btn">Gợi ý</button>
     <input type="text" id="hidden-input" autocomplete="off">
 
     <div id="overlay"></div>
     <div id="result-popup">
         <h2>🎉 Hoàn Thành! 🎉</h2>
         <p id="final-score"></p>
+        <p id="hint-count"></p>
         <p id="total-time"></p>
         <button id="play-again-btn">Chơi Lại</button>
     </div>
@@ -217,39 +263,48 @@ const originalWords = [
         let words = [];
         let currentWord = null;
         let score = 0;
-        const duration = 45000; // 45 giây mỗi từ
+        let hintCount = 0;
+        let hintCountThisWord = 0;
+        let totalLettersNeeded = 0;
+        let hintedIndices = [];
+        let completedCount = 0;
+        let lastHintCompletedTheWord = false; // MỚI: Đánh dấu lần hint cuối có làm hoàn thành từ không
+        const totalWords = originalWords.length;
+        const duration = 45000;
         let startTime = null;
         let timerInterval = null;
         let timeoutId = null;
 
         const gameArea = document.getElementById('game-area');
-        const inputArea = document.getElementById('input-area');
+        const lettersContainer = document.getElementById('letters-container');
         const hiddenInput = document.getElementById('hidden-input');
         const scoreDisplay = document.getElementById('score');
+        const progressDisplay = document.getElementById('progress');
         const messageDisplay = document.getElementById('message');
         const startBtn = document.getElementById('start-btn');
+        const hintBtn = document.getElementById('hint-btn');
         const overlay = document.getElementById('overlay');
         const resultPopup = document.getElementById('result-popup');
         const finalScoreText = document.getElementById('final-score');
+        const hintCountText = document.getElementById('hint-count');
         const totalTimeText = document.getElementById('total-time');
         const playAgainBtn = document.getElementById('play-again-btn');
 
         let boxes = [];
         let timerDisplay = null;
 
-        function createTimer() {
-            timerDisplay = document.getElementById('timer');
-            if (!timerDisplay) {
-                timerDisplay = document.createElement('div');
-                timerDisplay.id = 'timer';
-                gameArea.appendChild(timerDisplay);
-            }
+        function updateProgress() {
+            progressDisplay.textContent = `Từ đã làm: ${completedCount} / ${totalWords}`;
         }
 
         function startGame() {
             startBtn.style.display = 'none';
+            hintBtn.style.display = 'inline-block';
             score = 0;
+            hintCount = 0;
+            completedCount = 0;
             scoreDisplay.textContent = 'Điểm: 0';
+            updateProgress();
             messageDisplay.textContent = '';
             words = [...originalWords];
             startTime = Date.now();
@@ -265,30 +320,34 @@ const originalWords = [
             const idx = Math.floor(Math.random() * words.length);
             currentWord = words[idx];
             words.splice(idx, 1);
+            hintedIndices = [];
+            hintCountThisWord = 0;
+            lastHintCompletedTheWord = false;
+
+            totalLettersNeeded = currentWord.en.replace(/ /g, '').length;
 
             gameArea.innerHTML = '';
-            createTimer();
+            timerDisplay = document.createElement('div');
+            timerDisplay.id = 'timer';
+            gameArea.appendChild(timerDisplay);
 
             const wordEl = document.createElement('div');
             wordEl.id = 'vietnamese-word';
             wordEl.textContent = currentWord.vi;
             gameArea.appendChild(wordEl);
-
             wordEl.style.animation = `fall ${duration / 1000}s linear forwards`;
 
-            // Tạo ô chữ, xử lý space
-            inputArea.innerHTML = '';
+            lettersContainer.innerHTML = '';
             boxes = [];
-            const answer = currentWord.en.toLowerCase();
 
-            for (let i = 0; i < answer.length; i++) {
+            for (let i = 0; i < currentWord.en.length; i++) {
                 const box = document.createElement('div');
                 box.className = 'letter-box';
-                if (answer[i] === ' ') {
+                if (currentWord.en[i] === ' ') {
                     box.classList.add('space');
-                    box.textContent = '␣'; // Biểu tượng khoảng trắng (có thể thay bằng "_" hoặc "⎵")
+                    box.textContent = '␣';
                 }
-                inputArea.appendChild(box);
+                lettersContainer.appendChild(box);
                 boxes.push(box);
             }
 
@@ -297,12 +356,8 @@ const originalWords = [
             updateBoxes();
             messageDisplay.textContent = '';
 
-            // Đồng hồ đếm ngược
-            let timeLeft = 30;
-            timerDisplay.textContent = timeLeft;
-            timerDisplay.style.color = '#e74c3c';
-            timerDisplay.style.animation = 'none';
-
+            let timeLeft = 45;
+            timerDisplay.textContent = "CÒN LẠI: " + timeLeft;   // tạm thời hiển thị số này
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
@@ -318,21 +373,85 @@ const originalWords = [
         }
 
         function updateBoxes() {
-            const typed = hiddenInput.value.toLowerCase();
+            const typed = hiddenInput.value.toUpperCase();
             let typedIndex = 0;
 
-            boxes.forEach((box, i) => {
-                const correctChar = currentWord.en.toLowerCase()[i];
-                if (correctChar === ' ') {
-                    box.textContent = '␣';
-                    box.className = 'letter-box space';
+            boxes.forEach((box, boxIndex) => {
+                if (currentWord.en[boxIndex] === ' ') return;
+
+                const letterIndex = getLetterIndex(boxIndex);
+
+                if (hintedIndices.includes(letterIndex)) {
+                    box.textContent = currentWord.en[boxIndex].toUpperCase();
+                    box.className = 'letter-box hint filled';
                 } else {
-                    box.textContent = typed[typedIndex] || '';
+                    const char = typed[typedIndex] || '';
+                    box.textContent = char;
                     box.className = 'letter-box';
-                    if (typed[typedIndex]) box.classList.add('filled');
+                    if (char) box.classList.add('filled');
                     typedIndex++;
                 }
             });
+        }
+
+        function getLetterIndex(boxIndex) {
+            let count = 0;
+            for (let i = 0; i <= boxIndex; i++) {
+                if (currentWord.en[i] !== ' ') count++;
+            }
+            return count - 1;
+        }
+
+        function giveHint() {
+            const cleanAnswer = currentWord.en.replace(/ /g, '').toUpperCase();
+            const currentTypedBefore = getCurrentTyped();
+
+            // Kiểm tra xem trước khi hint có đầy đủ chưa
+            const wasCompleteBefore = currentTypedBefore === cleanAnswer;
+
+            for (let i = 0; i < cleanAnswer.length; i++) {
+                if (!hintedIndices.includes(i) && (currentTypedBefore[i] || '') !== cleanAnswer[i]) {
+                    hintedIndices.push(i);
+                    hintCount++;
+                    hintCountThisWord++;
+                    updateBoxes();
+                    break;
+                }
+            }
+
+            const currentTypedAfter = getCurrentTyped();
+
+            // Nếu sau lần hint này mới đủ từ → đánh dấu là hint cuối hoàn thành
+            if (!wasCompleteBefore && currentTypedAfter === cleanAnswer) {
+                lastHintCompletedTheWord = true;
+                checkAnswer(); // Tự động chấm và qua từ mới
+            }
+
+            hiddenInput.focus();
+        }
+
+        function getCurrentTyped() {
+            let result = '';
+            let typedIndex = 0;
+
+            for (let i = 0; i < currentWord.en.length; i++) {
+                if (currentWord.en[i] === ' ') continue;
+
+                const letterIndex = getLetterIndex(i);
+
+                if (hintedIndices.includes(letterIndex)) {
+                    result += currentWord.en[i].toUpperCase();
+                } else {
+                    result += (hiddenInput.value.toUpperCase()[typedIndex] || '');
+                    typedIndex++;
+                }
+            }
+            return result;
+        }
+
+        function completeCurrentWord() {
+            completedCount++;
+            updateProgress();
         }
 
         function checkAnswer() {
@@ -341,60 +460,63 @@ const originalWords = [
             clearInterval(timerInterval);
             timeoutId = null;
 
-            const typedLetters = hiddenInput.value.toLowerCase();
-            const correctLetters = currentWord.en.toLowerCase().replace(/ /g, '');
+            const correct = currentWord.en.replace(/ /g, '').toUpperCase();
+            const current = getCurrentTyped();
 
-            if (typedLetters === correctLetters) {
+            if (current === correct && !lastHintCompletedTheWord) {
+                // Đúng và không phải hint cuối hoàn thành → + điểm
                 score++;
                 scoreDisplay.textContent = `Điểm: ${score}`;
                 messageDisplay.textContent = '🎉 Đúng rồi! +1 điểm 🎉';
                 messageDisplay.style.color = '#2ecc71';
                 boxes.forEach(box => {
                     if (!box.classList.contains('space')) {
+                        box.classList.remove('hint');
                         box.classList.add('correct');
+                    }
+                });
+            } else if (current === correct && lastHintCompletedTheWord) {
+                // Đúng nhưng do hint cuối hoàn thành → không điểm
+                messageDisplay.textContent = '✅ Đúng nhưng dùng gợi ý chữ cuối – Không tính điểm';
+                messageDisplay.style.color = '#f39c12';
+                boxes.forEach(box => {
+                    if (!box.classList.contains('space')) {
+                        box.classList.add('hint');
                     }
                 });
             } else {
                 messageDisplay.textContent = `❌ Sai rồi! Đáp án: ${currentWord.en}`;
                 messageDisplay.style.color = '#e74c3c';
-                let charIdx = 0;
                 boxes.forEach((box, i) => {
-                    const ch = currentWord.en.toLowerCase()[i];
-                    if (ch === ' ') {
-                        box.textContent = '␣';
-                    } else {
-                        box.textContent = ch;
-                        charIdx++;
-                    }
-                    if (!box.classList.contains('space')) {
+                    if (currentWord.en[i] !== ' ') {
+                        box.textContent = currentWord.en[i].toUpperCase();
+                        box.classList.remove('hint');
                         box.classList.add('wrong');
                     }
                 });
             }
 
-            setTimeout(nextWord, 2500);
+            completeCurrentWord();
+            setTimeout(nextWord, lastHintCompletedTheWord ? 3000 : 2500);
         }
 
         function revealAnswer() {
-            timeoutId = null;
             clearInterval(timerInterval);
+            timeoutId = null;
             messageDisplay.textContent = `⏰ Hết giờ! Đáp án: ${currentWord.en}`;
             messageDisplay.style.color = '#f39c12';
 
             boxes.forEach((box, i) => {
-                const char = currentWord.en.toLowerCase()[i];
-                if (char === ' ') {
-                    box.textContent = '␣';
-                } else {
-                    box.textContent = char;
-                }
-                if (!box.classList.contains('space')) {
+                if (currentWord.en[i] !== ' ') {
+                    box.textContent = currentWord.en[i].toUpperCase();
                     box.style.backgroundColor = '#f39c12';
                     box.style.borderColor = '#e67e22';
                     box.style.color = 'white';
+                    box.classList.remove('hint');
                 }
             });
 
+            completeCurrentWord();
             setTimeout(nextWord, 3000);
         }
 
@@ -405,37 +527,52 @@ const originalWords = [
             const seconds = totalTime % 60;
             const timeStr = `${minutes} phút ${seconds.toString().padStart(2, '0')} giây`;
 
-            finalScoreText.innerHTML = `✅ Đúng: <strong>${score}</strong> / ${originalWords.length}<br>❌ Sai/Hết giờ: <strong>${originalWords.length - score}</strong>`;
+            finalScoreText.innerHTML = `✅ Đúng (có điểm): <strong>${score}</strong> / ${totalWords}<br>❌ Sai/Hết giờ/Gợi ý chữ cuối: <strong>${totalWords - score}</strong>`;
+            hintCountText.textContent = `💡 Số lần dùng gợi ý: ${hintCount}`;
             totalTimeText.textContent = `⏱ Tổng thời gian: ${timeStr}`;
 
             overlay.style.display = 'block';
             resultPopup.style.display = 'block';
+            hintBtn.style.display = 'none';
         }
 
         hiddenInput.addEventListener('input', () => {
-            const correctLetters = currentWord.en.toLowerCase().replace(/ /g, '');
-            if (hiddenInput.value.length > correctLetters.length) {
-                hiddenInput.value = hiddenInput.value.slice(0, correctLetters.length);
+            const hintedCount = hintedIndices.length;
+            const maxAllowedInput = totalLettersNeeded - hintedCount;
+
+            if (hiddenInput.value.length > maxAllowedInput) {
+                hiddenInput.value = hiddenInput.value.slice(0, maxAllowedInput);
             }
+
             updateBoxes();
 
-            if (hiddenInput.value.length === correctLetters.length) {
+            const currentTypedLength = getCurrentTyped().length;
+            if (currentTypedLength === totalLettersNeeded) {
+                lastHintCompletedTheWord = false; // Nếu tự gõ đủ → chắc chắn không phải hint cuối
                 checkAnswer();
             }
         });
 
-        hiddenInput.addEventListener('keydown', (e) => {
+        hiddenInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
-                checkAnswer();
+                const currentTypedLength = getCurrentTyped().length;
+                if (currentTypedLength > 0 && currentTypedLength <= totalLettersNeeded) {
+                    lastHintCompletedTheWord = false;
+                    checkAnswer();
+                }
             }
         });
 
+        hintBtn.addEventListener('click', giveHint);
         startBtn.addEventListener('click', startGame);
         playAgainBtn.addEventListener('click', () => {
             overlay.style.display = 'none';
             resultPopup.style.display = 'none';
             startGame();
         });
+
+        gameArea.addEventListener('click', () => hiddenInput.focus());
+        lettersContainer.addEventListener('click', () => hiddenInput.focus());
     </script>
 </body>
 </html>
